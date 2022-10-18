@@ -1,0 +1,2115 @@
+import random
+from tkinter import font
+from tkinter import *
+from tkinter import ttk
+import cx_Oracle
+import webbrowser
+import requests as rq
+import speech_recognition as sr
+import pyttsx3
+import pywhatkit
+import datetime
+import wikipedia
+import pyjokes
+import socket
+import tkinter as tk
+from PIL import Image, ImageTk
+from tkinter import filedialog
+from tkinter import messagebox
+import pickle
+from datetime import datetime
+import os
+import threading
+import struct
+import pyperclip
+
+try:
+    from ctypes import windll
+
+    windll.shcore.SetProcessDpiAwareness(1)
+except Exception:
+    print(Exception)
+
+root = Tk()
+root.config(bg='#121212')
+root.geometry("600x700")
+root.title("ASTROCHAT")
+root.state('zoomed')
+# application icon
+app_icon = Image.open(
+    "C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\images\\chat_ca.png")
+app_icon = ImageTk.PhotoImage(app_icon)
+root.iconphoto(False, app_icon)
+
+# login variables
+un = StringVar()
+pw = StringVar()
+# forgetpassword variables
+npw = StringVar()
+n = StringVar()
+cnpw = StringVar()
+# create act variables
+c_name = StringVar()
+c_uname = StringVar()
+c_pass = StringVar()
+c_id = StringVar()
+# timer variable
+txt = StringVar()
+# font value
+font_variable = 0
+# theme value
+theme_variable = 0
+# copy  variable
+copy_var = ''
+# reply variable
+reply_var = 0
+reply_msg = ''
+reply_updates = ''
+# frames
+homepage_frame = Frame(root, bg='#121212')
+login_frame = Frame(root, bg='#121212')
+forget_password_frame = Frame(root, bg='#121212')
+create_act_frame = Frame(root, bg='#121212')
+assistant_frame = Frame(root, bg='#121212')
+
+
+# event handlers
+def crt_act_handler(event):
+    c_mailE.delete(0, END)
+
+
+def crt_act_handler1():
+    c_nameE.delete(0, END)
+
+
+def crt_act_handler2(event):
+    c_dobE.delete(0, END)
+
+
+def crt_act_handler3(event):
+    c_usernameE.delete(0, END)
+
+
+def crt_act_handler4(event):
+    c_IDE.delete(0, END)
+
+
+def fp_handler(event):
+    u_name_labelE.delete(0, END)
+
+
+def fp_handler1(event):
+    forget_password()
+
+
+def login_handler1(event):
+    nameE.delete(0, END)
+
+
+def login_handler2(event):
+    check_login()
+
+
+# functions
+def clock_time():
+    time = datetime.now()
+    time = (time.strftime("Date: %Y-%m-%d \nTime: %H:%M:%S"))
+    txt.set(time)
+    root.after(1000, clock_time)
+
+
+# quote box moving
+def shift():
+    x1, y1, x2, y2 = canvas.bbox("marquee")
+    if x2 < 0 or y1 < 0:  # reset the coordinates
+        x1 = canvas.winfo_width()
+        y1 = canvas.winfo_height() // 2
+        canvas.coords("marquee", x1, y1)
+    else:
+        canvas.move("marquee", -2, 0)
+    canvas.after(1000 // fps, shift)
+
+
+def change_to_homepage_frame():
+    homepage_frame.pack(fill='both', expand=1)
+    login_frame.pack_forget()
+    forget_password_frame.pack_forget()
+    create_act_frame.pack_forget()
+    assistant_frame.pack_forget()
+    ai_container.place_forget()
+
+
+def change_to_forget_password_frame():
+    forget_password_frame.pack(fill='both', expand=1)
+    login_frame.pack_forget()
+    homepage_frame.pack_forget()
+    create_act_frame.pack_forget()
+    ai_container.place_forget()
+
+
+def change_to_create_act_frame():
+    create_act_frame.pack(fill='both', expand=1)
+    login_frame.pack_forget()
+    homepage_frame.pack_forget()
+    forget_password_frame.pack_forget()
+    ai_container.place_forget()
+
+
+def change_to_login_frame():
+    login_frame.pack(fill='both', expand=1, ipadx=600, ipady=700)
+    forget_password_frame.pack_forget()
+    create_act_frame.pack_forget()
+    assistant_frame.pack_forget()
+    root_btn.destroy()
+    root_lbl.destroy()
+    ai_container.place_forget()
+
+
+def change_to_assitant_frame():
+    assistant_frame.pack(fill='both', expand=1)
+    ai_container.place(relx=0.5, rely=0.5, height=800, width=1600, anchor=CENTER)
+    login_frame.pack_forget()
+    homepage_frame.pack_forget()
+    create_act_frame.pack_forget()
+    forget_password_frame.pack_forget()
+    root_btn.destroy()
+    root_lbl.destroy()
+
+
+names_list = []
+
+
+def name_collect():
+    try:
+        con = cx_Oracle.connect(user="system", password="oracle")
+    except Exception as err:
+        print("Error while creating connection ", err)
+    else:
+        try:
+            cur = con.cursor()
+            query = """select names from LOGIN_DB"""
+            cur.execute(query)
+            result = cur.fetchall()
+            for i in result:
+                k = list(i)
+                names_list.append(k[0])
+        except Exception as err:
+            print("error while fetching data ", err)
+            con.close()
+
+
+name_collect()
+
+
+def db_connection_check(u, p):
+    try:
+        con = cx_Oracle.connect(user="system", password="oracle")
+    except Exception as err:
+        print("Error while creating connection ", err)
+    else:
+        try:
+            cur = con.cursor()
+            query = """select id# from LOGIN_DB where user_name = :1 and pass = :2"""
+            data = [u, p]
+            cur.execute(query, data)
+            result = cur.fetchall()
+            return result
+        except Exception as err:
+            print("error while fetching data ", err)
+            con.close()
+
+
+def check_login():
+    u_name = un.get()
+    pass_word = pw.get()
+    data = db_connection_check(u_name, pass_word)
+    print(len(data))
+    if len(data) == 1:
+        messagebox.showinfo(title="hello " + str(u_name.capitalize()), message="welcome login passed")
+        change_to_homepage_frame()
+    else:
+        messagebox.showinfo(title="Hello USER", message="Enter The Correct credentials")
+
+
+def db_connection_CHANGE_PASSWORD(u, np):
+    try:
+        con = cx_Oracle.connect(user="system", password="oracle")
+    except Exception as err:
+        print("Error while creating connection ", err)
+    else:
+        try:
+            cur = con.cursor()
+            print(np)
+            print(u)
+            query = """UPDATE LOGIN_DB SET PASS = :1
+                       WHERE names = :2 """
+            data = [np, u]
+            cur.execute(query, data)
+            con.commit()
+            r = 2
+            if len(np) == 0 or len(u) == 0:
+                r = 1
+            return r
+        except Exception as err:
+            print("error while fetching data ", err)
+            con.close()
+
+
+def db_connection_insert(n, u, p, i):
+    try:
+        con = cx_Oracle.connect(user="system", password="oracle")
+    except Exception as err:
+        print("Error while creating connection ", err)
+    else:
+        try:
+            cur = con.cursor()
+            query = """insert into login_db(id#,user_name,pass,NAMES) values (:1,:2,:3,:4) """
+            data = [i, u, p, n]
+            cur.execute(query, data)
+            con.commit()
+            r = 3
+            return r
+        except Exception as err:
+            print("error while fetching data ", err)
+            con.close()
+
+
+def forget_password():
+    global fp_data
+    fp_n = n.get()
+    fp_npw = npw.get()
+    fp_cnpw = cnpw.get()
+    if fp_npw == fp_cnpw:
+        fp_data = db_connection_CHANGE_PASSWORD(fp_n, fp_npw)
+        notmatch = 1
+    else:
+        messagebox.showinfo(title="Hello USER", message="ENTERED PASSWORD DID NOT MATCH")
+        notmatch = 0
+    try:
+        if fp_data == 2 and notmatch == 1 and fp_n in names_list:
+            messagebox.showinfo(title="Hello USER", message="YOUR PASSWORD IS CHANGED,TRY TO LOGIN AGAIN")
+        if fp_n not in names_list:
+            messagebox.showerror(title='Name Error', message='Check Name,Enter The Name Of The User')
+    except:
+        pass
+
+
+def create_account():
+    c_n = c_name.get()
+    c_un = c_uname.get()
+    c_pw = c_pass.get()
+    c_idg = c_id.get()
+    data = db_connection_insert(c_n, c_un, c_pw, c_idg)
+    if len(c_n) == 0:
+        messagebox.showinfo(title="HELLO USER", message=" Your Account Has Not Created, Kindly Fill Name ")
+        data = 2
+    if len(c_un) == 0:
+        messagebox.showinfo(title="HELLO USER", message=" Your Account Has Not Created, Kindly Fill USERNAME ")
+        data = 2
+    if len(c_pw) == 0:
+        messagebox.showinfo(title="HELLO USER", message=" Your Account Has Not Created, Kindly Set PASSWORD ")
+        data = 2
+    if len(c_idg) == 0:
+        messagebox.showinfo(title="HELLO USER", message=" Your Account Has Not Created, Kindly Fill The GIVEN VIT ID ")
+        data = 2
+    if data == 3:
+        messagebox.showinfo(title="HELLO USER", message=" YOUR ACCOUNT HAS BEEN CREATED, Enjoy Chatting ")
+
+
+# =======================================================================================================
+# assistant functions
+# Ai resources
+engine = pyttsx3.init()
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[1].id)
+engine.runAndWait()
+
+# photos
+# reciving_commands
+greetings_cmd = ['hi', 'hello', 'hey!', 'hai', 'hey', 'hi astro', 'astro hi', 'hey astro', 'hi Astro', 'Astro hi',
+                 'hey Astro', 'Asho']
+greetings_reply = ['hi,i am you assistant', 'hello,how can i help you',
+                   'hello,i can play music and get some information for you']
+
+send_off_list_cmd = ["bye", 'thank you', 'good bye', 'see you later', 'i have work now', 'bye astro', 'bye Astro']
+send_off_list_reply = ['bye have nice day', 'i am always here to help', 'dont forget me!', 'miss you for a while',
+                       'bye']
+how_list_cmd = ['how are you', 'how are you?', 'are you feeling good', 'are you feeling well']
+news_list = ['today news', 'top news in the world', 'latest news']
+
+how_list = ['I am feeling good', 'feeling lonely', 'i feel exhausted of helping all']
+
+wh_cmd = ['who', 'who is', 'do you know', 'did you know', 'about']
+
+joke_cmd = ['one more joke', 'joke', 'another joke', 'tell me a joke', 'say a joke']
+
+login_frame_changing = ['chat room login', 'chatroom login', 'get me to login', 'need to login']
+crt_act_frame_changing = ['create a chatroom account', 'create a chat room account', 'chatroom account creation',
+                          'chatroom account creation',
+                          'how to create chatroom account', 'how to create a chatroom account']
+chat_room_cmd = ['open chat room', 'open chat', 'lets socialize', 'Astro open chat room', 'Astro open chat',
+                 'Astro lets socialize', 'astro open chat room', 'astro open chat', 'astro lets socialize']
+
+
+def my_thread():
+    try:
+        threading.Thread(target=run_astro).start()
+    except:
+        messagebox.showinfo(title="HELLO USER",
+                            message=" Don't click many times!,Speech Recognition is already running")
+
+
+def configure_scroll_region(event):
+    ai_canvas.configure(scrollregion=ai_canvas.bbox('all'))
+
+
+def resize_frame(e):
+    ai_canvas.itemconfig(scrollable_window, width=e.width)
+
+
+def sent_message_format(event):
+    message = AI_entry.get()
+    print(message)
+    if len(message) == 0:
+        return None
+    if message:
+        if event:
+            message = message.strip()
+            AI_entry.delete(0, END)
+
+    m_frame = Frame(scrollable_frame, bg="#595656")  # center line background
+    m_frame.columnconfigure(0, weight=1)
+    t_label = Label(m_frame, bg="#595656", fg="white", text=datetime.now().strftime('%H:%M'),
+                    font="lucida 12 bold", justify="right", anchor="e")
+
+    t_label.grid(row=0, column=0, padx=2, sticky="e")
+
+    m_label = Label(m_frame, wraplength=250, text=message, fg="white", bg="#121212",
+                    font="lucida 14 bold", justify="left",
+                    anchor="e")
+    m_label.grid(row=1, column=0, padx=2, pady=2, sticky="e")
+    m_frame.pack(pady=10, padx=40, expand=True, anchor="e")
+    ai_canvas.update_idletasks()
+    ai_canvas.yview_moveto(1.0)
+
+    # high
+    if font_variable == 1:
+        t_label.config(font="lucida 19 bold")
+        m_label.config(font="lucida 21 bold")
+        # medium
+    if font_variable == 2:
+        t_label.config(font="lucida 15 bold")
+        m_label.config(font="lucida 17 bold")
+        # small
+    if font_variable == 3:
+        t_label.config(font="lucida 12 bold")
+        m_label.config(font="lucida 14 bold")
+    AI_text()
+
+
+def insert_message(message):
+    m_frame = Frame(scrollable_frame, bg="#595656")  # center line background
+    m_frame.columnconfigure(0, weight=1)
+    t_label = Label(m_frame, bg="#595656", fg="white", text=datetime.now().strftime('%H:%M'),
+                    font="lucida 12 bold", justify="right", anchor="e")
+    t_label.grid(row=0, column=0, padx=2, sticky="e")
+
+    m_label = Label(m_frame, wraplength=250, text=message, fg="white", bg="#121212",
+                    font="lucida 14 bold", justify="left",
+                    anchor="e")
+    m_label.grid(row=1, column=0, padx=2, pady=2, sticky="e")
+    m_frame.pack(pady=10, padx=40, expand=True, anchor="e")
+
+    # high
+    if font_variable == 1:
+        t_label.config(font="lucida 19 bold")
+        m_label.config(font="lucida 21 bold")
+        # medium
+    if font_variable == 2:
+        t_label.config(font="lucida 15 bold")
+        m_label.config(font="lucida 17 bold")
+        # small
+    if font_variable == 3:
+        t_label.config(font="lucida 12 bold")
+        m_label.config(font="lucida 14 bold")
+    ai_canvas.update_idletasks()
+    ai_canvas.yview_moveto(1.0)
+
+
+def label_handler(event):
+    global stop
+    stop = 0
+    listent_event.pack()
+
+
+def AI_message(message):
+    m_frame = Frame(scrollable_frame, bg="#595656")  # center line background
+    m_frame.columnconfigure(0, weight=1)
+    t_label = Label(m_frame, bg="#595656", fg="white", text=datetime.now().strftime('%H:%M'),
+                    font="lucida 12 bold", justify="right", anchor="w")
+    t_label.grid(row=0, column=0, padx=2, sticky="w")
+
+    m_label = Label(m_frame, wraplength=250, text=message, fg="white", bg="#121212",
+                    font="lucida 14 bold", justify="left",
+                    anchor="e")
+    m_label.grid(row=1, column=0, padx=2, pady=2, sticky="w")
+    m_frame.pack(pady=10, padx=40, expand=True, anchor="w")
+    ai_canvas.update_idletasks()
+    ai_canvas.yview_moveto(4.0)
+
+    if font_variable == 1:
+        t_label.config(font="lucida 19 bold")
+        m_label.config(font="lucida 21 bold")
+        # medium
+    if font_variable == 2:
+        t_label.config(font="lucida 15 bold")
+        m_label.config(font="lucida 17 bold")
+        # small
+    if font_variable == 3:
+        t_label.config(font="lucida 12 bold")
+        m_label.config(font="lucida 14 bold")
+
+
+def AI_text():
+    text_assist_val = AI_entry.get()
+    text_assist_val.strip()
+    text_assist_val.rstrip()
+    text_assist_val.lstrip()
+    text_assist_val.lower()
+    if 'time' in text_assist_val:
+        time = datetime.now().strftime('%I:%M %p')
+        AI_message(' Current time is ' + time)
+
+    elif 'play' in text_assist_val or 'song' in text_assist_val:
+        song = text_assist_val.replace('play', '')
+        AI_message(' Playing Song ' + song)
+        pywhatkit.playonyt(song)
+
+    elif 'who' in text_assist_val or 'who is' in text_assist_val or \
+            'do you know' in text_assist_val or 'did you know' in text_assist_val or \
+            'about' in text_assist_val:
+        person = text_assist_val.replace('who', "")
+        person_info = wikipedia.summary(person, 2)
+        AI_message(' ' + person_info)
+    elif 'are you single' in text_assist_val:
+        AI_message(' sorry, I am having relationship  with wifi')
+
+    elif text_assist_val in joke_cmd:
+        j = pyjokes.get_joke()
+        AI_message(' ' + j)
+    elif text_assist_val in greetings_cmd:
+        var = random.randint(0, 2)
+        AI_message(' ' + greetings_reply[var])
+    elif text_assist_val in send_off_list_cmd:
+        var = random.randint(0, 4)
+        AI_message(' ' + send_off_list_reply[var])
+    elif text_assist_val in news_list:
+        print(text_assist_val)
+        main_url = " https://newsapi.org/v1/articles?source=bbc-news&sortBy=top&apiKey=4dbc17e007ab436fb66416009dfb59a8"
+        open_bbc_page = rq.get(main_url).json()
+        article = open_bbc_page["articles"]
+        results = []
+        AI_message(' Top Results Of The News Are:')
+        for ar in article:
+            results.append(ar["title"])
+        for i in range(1, len(results)):
+            print(results[i], i + 1)
+            AI_message(str(i) + ' ' + results[i])
+
+    elif text_assist_val in how_list_cmd:
+        var = random.randint(0, 2)
+        AI_message(' ' + how_list[var])
+    elif text_assist_val == 'google' or text_assist_val == 'open browser':
+        webbrowser.open('https://www.google.co.uk/')
+
+    elif text_assist_val == 'facebook' or text_assist_val == 'open facebook':
+        webbrowser.open('https://www.facebook.com/')
+
+    elif text_assist_val == 'insta' or text_assist_val == 'instagram' or \
+            text_assist_val == 'open insta' or text_assist_val == 'open instagram':
+        webbrowser.open('https://www.instagram.com/accounts/login/')
+
+    elif text_assist_val == 'twitter' or text_assist_val == 'open twitter':
+        webbrowser.open('https://twitter.com/LOGIN')
+
+    elif text_assist_val == 'whatsapp' or text_assist_val == 'open whatsapp' or \
+            text_assist_val == 'whats app' or text_assist_val == 'open whats app':
+        webbrowser.open('https://www.whatsapp.com/')
+    elif text_assist_val in login_frame_changing:
+        AI_message('Moving to login ')
+        change_to_login_frame()
+    elif text_assist_val in crt_act_frame_changing:
+        AI_message('Moving to account creation')
+        change_to_create_act_frame()
+    elif text_assist_val in chat_room_cmd:
+        AI_message('Moving to Chat Room ')
+        obf()
+    else:
+        AI_message('Invalid Command,Please Try Again')
+
+
+def reciving_command():
+    r = sr.Recognizer()
+    r.pause_threshold = 2
+    with sr.Microphone() as source:
+        print("astro: Listening...")
+        audio = r.listen(source)
+        try:
+            reciving_command = r.recognize_google(audio)
+            print(f"master:{reciving_command}")
+            listent_event.pack_forget()
+            return reciving_command
+        except:
+            print("Try Again")
+            speak('i could not recognize the voice')
+
+
+def speak(audio):
+    engine.say(audio)
+    engine.runAndWait()
+
+
+stop = 0
+
+
+def run_astro():
+    while True:
+        listent_event.pack()
+        if stop == 1:
+            listent_event.pack_forget()
+            break
+        try:
+            recived_command = reciving_command()
+            if 'play' in recived_command:
+                song = recived_command.replace('play', '')
+                AI_message(' Playing Song ' + song)
+
+                speak('playing song ' + song)
+                pywhatkit.playonyt(song)
+                break
+
+            elif 'time' in recived_command:
+                time = datetime.now().strftime('%I:%M %p')
+                print(recived_command)
+                # print(time)
+                AI_message(' Current time is ' + time)
+
+                speak('Current time is ' + time)
+
+            elif 'who' in recived_command or 'who is' in recived_command or \
+                    'do you know' in recived_command or 'did you know' in recived_command or \
+                    'about' in recived_command:
+                person = recived_command.replace('who', "")
+                person_info = wikipedia.summary(person, 2)
+                # print(recived_command + "\n")
+                # print('Assistant\n', person_info)
+                AI_message(' ' + person_info)
+
+                speak(person_info)
+
+            elif 'are you single' in recived_command:
+                # print(recived_command)
+                AI_message('sorry, I am having relationship  with wifi')
+
+                speak('sorry, I am having relationship  with wifi')
+
+            elif recived_command in joke_cmd:
+                # print(recived_command)
+                j = pyjokes.get_joke()
+                AI_message(' ' + j)
+
+                speak(j)
+
+            elif recived_command in greetings_cmd:
+                var = random.randint(0, 2)
+                # print(var)
+                AI_message(' ' + greetings_reply[var])
+
+                speak(greetings_reply[var])
+
+            elif recived_command in send_off_list_cmd:
+                # print(recived_command)
+                var = random.randint(0, 4)
+                AI_message(' ' + send_off_list_reply[var])
+
+                speak(send_off_list_reply[var])
+                break
+
+            elif recived_command in news_list:
+                main_url = "https://newsapi.org/v1/articles?source=bbc-news&sortBy=top&apiKey" \
+                           "=4dbc17e007ab436fb66416009dfb59a8 "
+                open_bbc_page = rq.get(main_url).json()
+                article = open_bbc_page["articles"]
+                results = []
+                AI_message(' Top Results Of The News Are:')
+                speak('Top results of news are')
+                for ar in article:
+                    results.append(ar["title"])
+                for i in range(1, len(results) + 1):
+                    # printing all trending news
+                    print(i + 1, results[i])
+                    AI_message(str(i) + ' ' + results[i])
+
+                    speak(results[i])
+
+            elif recived_command in how_list_cmd:
+                print(recived_command)
+                var = random.randint(0, 2)
+                AI_message(' ' + how_list[var])
+
+                speak(how_list[var])
+
+            elif recived_command == 'google' or recived_command == 'open browser':
+                webbrowser.open('https://www.google.co.uk/')
+
+            elif recived_command == 'facebook' or recived_command == 'open facebook':
+                webbrowser.open('https://www.facebook.com/')
+
+            elif recived_command == 'insta' or recived_command == 'instagram' or \
+                    recived_command == 'open insta' or recived_command == 'open instagram':
+                webbrowser.open('https://www.instagram.com/accounts/login/')
+
+            elif recived_command == 'twitter' or recived_command == 'open twitter':
+                webbrowser.open('https://twitter.com/LOGIN')
+
+            elif recived_command == 'whatsapp' or recived_command == 'open whatsapp' \
+                    or recived_command == 'whats app' or recived_command == 'open whats app':
+                webbrowser.open('https://www.whatsapp.com/')
+
+            elif recived_command in login_frame_changing:
+                AI_message('Moving to login ')
+                speak('Moving to login')
+                change_to_login_frame()
+
+            elif recived_command in crt_act_frame_changing:
+                AI_message('Moving to login ')
+                speak('Moving to account creation')
+                change_to_create_act_frame()
+            elif recived_command in chat_room_cmd:
+                AI_message('Moving to Chat Room ')
+                speak('Moving to Chat Room')
+                obf()
+            else:
+                speak('Invalid Command,Try Again')
+                AI_message(' Invalid Command,Try Again')
+        except:
+            pass
+
+
+def AI_bind_enter(event):
+    message = AI_entry.get()
+    insert_message(message)
+    if len(message) == 0:
+        return None
+    AI_text()
+    if message:
+        if event:
+            AI_entry.delete(0, END)
+            message.strip()
+
+
+def func_stop_handler(event):
+    global stop
+    stop = 1
+    listent_event.pack_forget()
+
+
+# =======================================================================================================
+
+# chat room code
+class FirstScreen(tk.Toplevel):
+    def __init__(self):
+        super().__init__()
+
+        screen_width, screen_height = self.winfo_screenwidth(), self.winfo_screenheight()
+
+        self.x_co = int((screen_width / 2) - (550 / 2))
+        self.y_co = int((screen_height / 2) - (400 / 2)) - 80
+        self.geometry(f"550x400+{self.x_co}+{self.y_co}")
+
+        self.title("ASTROCHAT")
+        self.state('zoomed')
+
+        self.user = None
+        self.image_extension = None
+        self.image_path = None
+
+        self.first_frame = tk.Frame(self, bg="#121212")
+        self.first_frame.pack(fill="both", expand=True)
+
+        app_icon = Image.open(
+            "C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\images\\chat_ca.png")
+        app_icon = ImageTk.PhotoImage(app_icon)
+
+        self.iconphoto(False, app_icon)
+
+        upload_image = Image.open(
+            "C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\images\\upload_ca.png")
+        upload_image = upload_image.resize((60, 60), Image.ANTIALIAS)
+        upload_image = ImageTk.PhotoImage(upload_image)
+
+        self.user_image = "C:\\Users\\Admin01\\Downloads\\python project details\\photos\\tele user.png"
+
+        spl_label = tk.Label(self.first_frame, bg='#121212')
+        spl_label.place(x=0, y=0)
+
+        self.my_canvas_nick = Canvas(self.first_frame, bg='#121212', highlightbackground="#00FFFF")
+        self.my_canvas_nick.pack()
+        self.my_canvas_nick.place(x=380, y=145, height=800, width=1200)
+
+        head = tk.Label(self.first_frame, text="CREATE A NICKNAME", font="lucida 20 bold", fg="gold", bg='#121212',
+                        pady=12)
+        head.place(x=810, y=180)
+
+        self.profile_label = tk.Label(self.first_frame, bg="grey")
+        self.profile_label.place(x=850, y=465, width=170, height=160)
+
+        upload_label = Label(self.first_frame, image=upload_image, bg='#121212')
+        upload_label.pack()
+        upload_label.place(x=790, y=695)
+
+        upload_button = tk.Button(self.first_frame, cursor='hand2', text='+ Upload Photo', bd=0, border=0, bg='#FFFF00',
+                                  font=('Segoe UI', 18), activeforeground='black', activebackground='#FFFF00',
+                                  command=self.add_photo)
+        upload_button.place(x=850, y=700)
+
+        spl_label2 = Label(self.first_frame, image=new_fp_label_img, bg='#121212')
+        spl_label2.place(x=10, y=10)
+
+        self.my_canvas_nick.create_text(150, 190, text='NICKNAME: ', font=('helvitica', 22), fill='white')
+        self.my_canvas_nick.create_text(550, 270, text='Upload An Image', fill='white', font=('helvitica', 22))
+
+        self.username_entry = tk.Entry(self.first_frame, font="lucida 12 bold",
+                                       highlightcolor="purple", highlightthickness=1)
+        self.username_entry.place(x=700, y=320, height=34, width=260)
+        self.username_entry.focus_set()
+
+        spl_label3 = Label(self.first_frame, text='Your Privacy Is Our Priority', bg='#121212', fg='white',
+                           font=('helvitica', 18))
+        spl_label3.place(
+            x=820,
+            y=950)
+        if theme_variable == 2:
+            print(theme_variable)
+            self.first_frame.config(bg='#FFFFFF')
+            spl_label.config(bg='#FFFFFF')
+            spl_label2.config(image=new_fp_label_img_white, bg='#FFFFFF')
+            self.my_canvas_nick.config(bg='#FFFFFF', highlightbackground="#00FFFF")
+            head.config(fg='black', bg='#ffffff')
+            upload_label.config(bg='#FFFFFF')
+            self.my_canvas_nick.create_text(150, 190, text='NICKNAME: ', font=('helvitica', 22), fill='black')
+            self.my_canvas_nick.create_text(550, 270, text='Upload An Image', fill='black', font=('helvitica', 22))
+
+        if theme_variable == 1:
+            print(theme_variable)
+            self.first_frame.config(bg='#121212')
+            spl_label.config(bg='#121212')
+            spl_label2.config(image=new_fp_label_img
+                              , bg='#121212')
+            self.my_canvas_nick.config(bg='#121212', highlightbackground="#00FFFF")
+            head.config(fg='black', bg='#121212')
+            upload_label.config(bg='#121212')
+            self.my_canvas_nick.create_text(150, 190, text='NICKNAME: ', font=('helvitica', 22), fill='black')
+            self.my_canvas_nick.create_text(550, 270, text='Upload An Image', fill='black', font=('helvitica', 22))
+
+        submit_button = tk.Button(self.first_frame, command=self.process_data, text="Connect", font="lucida 12 bold",
+                                  padx=30, cursor="hand2",
+                                  bg="#16cade", relief="solid", bd=2, )
+        submit_button.place(x=860, y=800)
+
+        self.mainloop()
+
+    def add_photo(self):
+        self.image_path = filedialog.askopenfilename()
+        image_name = os.path.basename(self.image_path)
+        self.image_extension = image_name[image_name.rfind('.') + 1:]
+
+        if self.image_path:
+            user_image = Image.open(self.image_path)
+            user_image = user_image.resize((150, 140), Image.ANTIALIAS)
+            user_image.save('resized' + image_name)
+            user_image.close()
+
+            self.image_path = 'resized' + image_name
+            user_image = Image.open(self.image_path)
+
+            user_image = ImageTk.PhotoImage(user_image)
+            self.profile_label.image = user_image
+            self.profile_label.config(image=user_image)
+
+    def process_data(self):
+        if self.username_entry.get():
+            self.profile_label.config(image="")
+
+            if len((self.username_entry.get()).strip()) > 8:
+                self.user = self.username_entry.get()[:8] + "."
+            else:
+                self.user = self.username_entry.get()
+
+            client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            try:
+                client_socket.connect(("localhost", 12345))
+                status = client_socket.recv(1024).decode()
+                if status == 'not_allowed':
+                    client_socket.close()
+                    messagebox.showinfo(title="Can't connect !", message='Sorry, server is completely occupied.'
+                                                                         'Try again later')
+                    return
+
+            except ConnectionRefusedError:
+                messagebox.showinfo(title="Can't connect !", message="Server is offline , try again later.")
+                print("Server is offline , try again later.")
+                self.destroy()
+                return
+
+            client_socket.send(self.user.encode('utf-8'))
+
+            if not self.image_path:
+                self.image_path = self.user_image
+            with open(self.image_path, 'rb') as image_data:
+                image_bytes = image_data.read()
+
+            image_len = len(image_bytes)
+            image_len_bytes = struct.pack('i', image_len)
+            client_socket.send(image_len_bytes)
+
+            if client_socket.recv(1024).decode() == 'received':
+                client_socket.send(str(self.image_extension).strip().encode())
+
+            client_socket.send(image_bytes)
+
+            clients_data_size_bytes = client_socket.recv(1024)
+            clients_data_size_int = struct.unpack('i', clients_data_size_bytes)[0]
+            b = b''
+            while True:
+                clients_data_bytes = client_socket.recv(1024)
+                b += clients_data_bytes
+                if len(b) == clients_data_size_int:
+                    break
+
+            clients_connected = pickle.loads(b)
+
+            client_socket.send('image_received'.encode())
+
+            user_id = struct.unpack('i', client_socket.recv(1024))[0]
+            print(f"{self.user} is user no. {user_id}")
+            ChatScreen(self, self.first_frame, client_socket, clients_connected, user_id)
+
+
+class ChatScreen(tk.Canvas):
+    def __init__(self, parent, first_frame, client_socket, clients_connected, user_id):
+        super().__init__(parent)
+        self.window = 'Chat'
+        self.config(bg='#121212')
+        self.first_frame = first_frame
+        self.first_frame.pack_forget()
+
+        self.parent = parent
+
+        self.parent.bind('<Return>', lambda e: self.sent_message_format(e))
+
+        self.all_user_image = {}
+
+        self.user_id = user_id
+
+        self.clients_connected = clients_connected
+
+        # self.parent.protocol("WM_DELETE_WINDOW", lambda: self.on_closing(self.first_frame))
+        self.parent.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+        self.client_socket = client_socket
+        _, screen_height = self.winfo_screenwidth(), self.winfo_screenheight()
+
+        def chat_scroll_handler(event):
+            print('got')
+            self.canvas.yview_scroll(int(-1 * (event.delta / 60)), "units")
+
+        user_image = Image.open(self.parent.image_path)
+        user_image = user_image.resize((40, 40), Image.ANTIALIAS)
+        self.user_image = ImageTk.PhotoImage(user_image)
+
+        # global background
+        # background = Image.open("images/chat_bg_ca.png")
+        # background = background.resize((1600, 1500), Image.ANTIALIAS)
+        # background = ImageTk.PhotoImage(background)
+
+        global group_photo
+        group_photo = Image.open(
+            "C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\images\\group_ca.png")
+        group_photo = group_photo.resize((90, 90), Image.ANTIALIAS)
+        group_photo = ImageTk.PhotoImage(group_photo)
+
+        self.y = 140
+        self.clients_online_labels = {}
+
+        # self.create_image(0, 0, image=background)
+        self.create_image(210, 50, image=new_fp_label_img)
+
+        container = tk.Frame(self, highlightbackground="#F2EA02", highlightthickness=2)  ##FFFF00 main outer
+        container.place(x=10, y=110, width=1400, height=780)
+
+        self.canvas = tk.Canvas(container, bg="#121212")  # screen back main
+        self.scrollable_frame = tk.Frame(self.canvas, bg="#121212")
+
+        scrollable_window = self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
+
+        def configure_scroll_region(e):
+            self.canvas.configure(scrollregion=self.canvas.bbox('all'))
+
+        def resize_frame(e):
+            self.canvas.itemconfig(scrollable_window, width=e.width)
+
+        self.scrollable_frame.bind("<Configure>", configure_scroll_region)
+
+        scrollbar = ttk.Scrollbar(container, orient="vertical", command=self.canvas.yview)
+        self.canvas.configure(yscrollcommand=scrollbar.set)
+        self.yview_moveto(12.0)
+
+        scrollbar.pack(side="right", fill="y")
+
+        self.canvas.bind("<Configure>", resize_frame)
+        self.canvas.pack(fill="both", expand=True)
+        self.canvas.bind_all("<MouseWheel>", chat_scroll_handler)
+        self.canvas.focus_get()
+        send_button = tk.Button(self, image=send_logo_img_small, bd=0, border=0, command=self.sent_message_format,
+                                highlightbackground="#121212", bg='#121212',
+                                highlightthickness=2)
+        send_button.place(x=1230, y=895)
+
+        self.entry = tk.Text(self, font="lucida 14 bold", width=38, height=1.7,
+                             highlightcolor="blue", highlightthickness=1)
+        self.entry.place(x=10, y=895, width=1200)
+
+        self.entry.focus_set()
+        # ---------------------------emoji code logic-----------------------------------
+
+        emoji_data = [(
+            'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+            'emojis\\u0001f44a.png',
+            '\U0001F44A'), (
+            'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\emojis/u0001f44c.png',
+            '\U0001F44C'), (
+            'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\emojis/u0001f44d.png',
+            '\U0001F44D'),
+            (
+                'C:\\Users\\Admin01\\Downloads\\python project '
+                'details\\Chat-App-main\\Chat-App-main\\emojis/u0001f495.png',
+                '\U0001F495'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f496.png',
+                '\U0001F496'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f4a6.png',
+                '\U0001F4A6'),
+            (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f4a9.png',
+                '\U0001F4A9'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f4af.png',
+                '\U0001F4AF'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f595.png',
+                '\U0001F595'),
+            (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f600.png',
+                '\U0001F600'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f602.png',
+                '\U0001F602'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f603.png',
+                '\U0001F603'),
+            (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f605.png',
+                '\U0001F605'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f606.png',
+                '\U0001F606'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f608.png',
+                '\U0001F608'),
+            (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f60d.png',
+                '\U0001F60D'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f60e.png',
+                '\U0001F60E'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f60f.png',
+                '\U0001F60F'),
+            (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f610.png',
+                '\U0001F610'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f618.png',
+                '\U0001F618'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f61b.png',
+                '\U0001F61B'),
+            (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f61d.png',
+                '\U0001F61D'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f621.png',
+                '\U0001F621'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f624.png',
+                '\U0001F621'),
+            (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f631.png',
+                '\U0001F631'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f632.png',
+                '\U0001F632'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f634.png',
+                '\U0001F634'),
+            (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f637.png',
+                '\U0001F637'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f642.png',
+                '\U0001F642'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f64f.png',
+                '\U0001F64F'),
+            (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f920.png',
+                '\U0001F920'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f923.png',
+                '\U0001F923'), (
+                'C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\'
+                'emojis/u0001f928.png',
+                '\U0001F928')]
+
+        emoji_x_pos = 1420  # 490
+        emoji_y_pos = 650  # 520
+        for Emoji in emoji_data:
+            global emojis
+            emojis = Image.open(Emoji[0])
+            emojis = emojis.resize((40, 40), Image.ANTIALIAS)
+            emojis = ImageTk.PhotoImage(emojis)
+
+            emoji_unicode = Emoji[1]
+            emoji_label = tk.Label(self, image=emojis, text=emoji_unicode, bg="#194548", cursor="hand2")
+            emoji_label.image = emojis
+            emoji_label.place(x=emoji_x_pos, y=emoji_y_pos)
+            emoji_label.bind('<Button-1>', lambda x: self.insert_emoji(x))
+
+            emoji_x_pos += 42  # 25
+            cur_index = emoji_data.index(Emoji)
+            if (cur_index + 1) % 6 == 0:
+                emoji_y_pos += 40
+                emoji_x_pos = 1420  # 490
+
+        # -------------------end of emoji code logic-------------------------------------
+
+        m_frame = tk.Frame(self.scrollable_frame, bg="#121212")
+
+        t_label = tk.Label(m_frame, bg="#121212", fg='white', text='Joined Chat on ' + datetime.now().strftime('%H:%M'),
+                           font="lucida 13 bold")
+        t_label.pack()
+
+        m_label = tk.Label(m_frame, wraplength=250, text=f"Get Connected Socially {self.parent.user}",
+                           font="lucida 10 bold", bg="#E6FB04")
+        m_label.pack(fill="x")
+        m_frame.pack(pady=10, padx=10, fill="x", expand=True, anchor="e")
+
+        self.pack(fill="both", expand=True)
+
+        self.clients_online([])
+        # themes
+        if theme_variable == 2:
+            self.config(bg='#ffffff')
+            container.config(bg='#FFFFFF', highlightbackground='#FFFFFF')
+            self.canvas.config(bg='#FFFFFF')
+            self.scrollable_frame.config(bg='#FFFFFF')
+            send_button.config(highlightbackground="#FFFFFF", bg='#FFFFFF', image=send_logo_img_white)
+            self.create_image(210, 50, image=new_fp_label_img_white)
+        # dark
+        if theme_variable == 1:
+            self.config(bg='#121212')
+            container.config(bg='#121212', highlightbackground='#FFFFFF')
+            self.canvas.config(bg='#121212')
+            self.scrollable_frame.config(bg='#121212')
+            send_button.config(highlightbackground="#121212", bg='#121212', image=send_logo_img_white)
+            self.create_image(210, 50, image=new_fp_label_img)
+        # high
+        if font_variable == 1:
+            t_label.config(font="lucida 20 bold")
+            m_label.config(font="lucida 17 bold")
+        # medium
+        if font_variable == 2:
+            t_label.config(font="lucida 16 bold")
+            m_label.config(font="lucida 13 bold")
+        # small
+        if font_variable == 3:
+            t_label.config(font="lucida 13 bold")
+            m_label.config(font="lucida 10 bold")
+
+        t = threading.Thread(target=self.receive_data)
+        t.daemon = True
+        t.start()
+
+    def receive_data(self):
+        while True:
+            try:
+                data_type = self.client_socket.recv(1024).decode()
+
+                if data_type == 'notification':
+                    data_size = self.client_socket.recv(2048)
+                    data_size_int = struct.unpack('i', data_size)[0]
+
+                    b = b''
+                    while True:
+                        data_bytes = self.client_socket.recv(1024)
+                        b += data_bytes
+                        if len(b) == data_size_int:
+                            break
+                    data = pickle.loads(b)
+                    self.notification_format(data)
+
+                else:
+                    data_bytes = self.client_socket.recv(1024)
+                    data = pickle.loads(data_bytes)
+                    self.received_message_format(data)
+
+            except ConnectionAbortedError:
+                print("you disconnected ...")
+                self.client_socket.close()
+                break
+            except ConnectionResetError:
+                messagebox.showinfo(title='No Connection !', message="Server offline..try connecting again later")
+                self.client_socket.close()
+                self.first_screen()
+                break
+
+    def on_closing(self):
+        if self.window == 'ChatScreen':
+            res = messagebox.askyesno(title='Warning !', message="Do you really want to disconnect ?")
+            if res:
+                import os
+                os.remove(self.all_user_image[self.user_id])
+                self.client_socket.close()
+                self.first_screen()
+        else:
+            self.parent.destroy()
+
+    def received_message_format(self, data):
+
+        message = data['message']
+        from_ = data['from']
+
+        sender_image = self.clients_connected[from_][1]
+        sender_image_extension = self.clients_connected[from_][2]
+
+        # if not os.path.exists(f"{from_}.{sender_image_extension}"):
+        with open(f"{from_}.{sender_image_extension}", 'wb') as f:
+            f.write(sender_image)
+
+        im = Image.open(f"{from_}.{sender_image_extension}")
+        im = im.resize((40, 40), Image.ANTIALIAS)
+        im = ImageTk.PhotoImage(im)
+
+        m_frame = tk.Frame(self.scrollable_frame, bg="#595656")
+
+        m_frame.columnconfigure(1, weight=1)
+
+        t_label = tk.Label(m_frame, bg="#595656", fg="white", text=datetime.now().strftime('%H:%M'),
+                           font="lucida 7 bold",
+                           justify="left", anchor="w")
+
+        t_label.grid(row=0, column=1, padx=2, sticky="w")
+
+        m_label = tk.Label(m_frame, wraplength=250, fg="black", bg="#c5c7c9", text=message, font="lucida 9 bold",
+                           justify="left",
+                           anchor="w")
+        m_label.grid(row=1, column=1, padx=2, pady=2, sticky="w")
+
+        i_label = tk.Label(m_frame, bg="#595656", image=im)
+        i_label.image = im
+        i_label.grid(row=0, column=0, rowspan=2)
+
+        def reply_set():
+            global reply_var
+            reply_var = 1
+
+        # copy and paste messages
+        def copy_msg():
+            global copy_var
+            copy_var = message
+            print(copy_var)
+            pyperclip.copy(copy_var)
+
+        def paste_msg():
+            positon = self.entry.index(INSERT)
+            self.entry.insert(positon, pyperclip.paste())
+
+        def paste_msg_event(e):
+            positon = self.entry.index(INSERT)
+            self.entry.insert(positon, pyperclip.paste())
+            root.clipboard_clear()
+
+        if self.entry.tag_ranges(tk.SEL):
+            print('SELECTED Text is %r' % self.entry.get(tk.SEL_FIRST, tk.SEL_LAST))
+            self.entry.delete(tk.SEL_FIRST, tk.SEL_LAST)
+            positon = self.entry.index(INSERT)
+            self.entry.insert(positon, pyperclip.paste())
+
+        def deleted():
+            m_label.config('message deleted')
+
+        # copy and delete
+        right_click = Menu(root, tearoff=0)
+        right_click_small = Menu(root, tearoff=False)
+        right_click_small.add_command(label='Paste', command=paste_msg)
+
+        right_click.add_command(label="Delete", command=deleted)
+        right_click.add_command(label="Reply", command=reply_set)
+        right_click.add_command(label="Copy", command=copy_msg)
+
+        def do_popup(event):
+            try:
+                right_click.tk_popup(event.x_root, event.y_root)
+            finally:
+                right_click.grab_release()
+
+        def do_popup_small(event):
+            try:
+                right_click_small.tk_popup(event.x_root, event.y_root)
+            finally:
+                right_click_small.grab_release()
+
+        self.entry.bind('<Button-3>', do_popup_small)
+        self.entry.bind('<Control-Key-v>', paste_msg_event)
+        m_label.bind("<Button-3>", do_popup)
+
+        m_frame.pack(pady=10, padx=10, fill="x", expand=True, anchor="e")
+
+        self.canvas.update_idletasks()
+        self.canvas.yview_moveto(1.0)
+
+    # ======================================== sending
+    def sent_message_format(self, event=None):
+
+        message = self.entry.get('1.0', 'end-1c')
+
+        if message:
+            if event:
+                message = message.strip()
+            self.entry.delete("1.0", "end-1c")
+
+            from_ = self.user_id
+
+            data = {'from': from_, 'message': message}
+            data_bytes = pickle.dumps(data)
+
+            self.client_socket.send(data_bytes)
+
+            m_frame = tk.Frame(self.scrollable_frame, bg="#595656")
+
+            m_frame.columnconfigure(0, weight=1)
+
+            t_label = tk.Label(m_frame, bg="#595656", fg="white", text=datetime.now().strftime('%H:%M'),
+                               font="lucida 7 bold", justify="right", anchor="e")
+            t_label.grid(row=0, column=0, padx=2, sticky="e")
+
+            m_label = tk.Label(m_frame, wraplength=250, text=message, fg="black", bg="#FFE5E5",
+                               font="lucida 9 bold", justify="left",
+                               anchor="e")
+            m_label.grid(row=1, column=0, padx=2, pady=2, sticky="e")
+
+            i_label = tk.Label(m_frame, bg="#595656", image=self.user_image)
+            i_label.image = self.user_image
+            i_label.grid(row=0, column=1, rowspan=2, sticky="e")
+
+            def deleted():
+                m_label.config(text='message is deleted')
+
+            # copy and paste messages
+            def copy_msg():
+                global copy_var
+                copy_var = message
+                print(copy_var)
+                pyperclip.copy(copy_var)
+
+            def paste_msg():
+                positon = self.entry.index(INSERT)
+                self.entry.insert(positon, pyperclip.paste())
+
+            def paste_msg_event(e):
+                positon = self.entry.index(INSERT)
+                self.entry.insert(positon, pyperclip.paste())
+                root.clipboard_clear()
+
+            if self.entry.tag_ranges(tk.SEL):
+                print('SELECTED Text is %r' % self.entry.get(tk.SEL_FIRST, tk.SEL_LAST))
+                self.entry.delete(tk.SEL_FIRST, tk.SEL_LAST)
+                positon = self.entry.index(INSERT)
+                self.entry.insert(positon, pyperclip.paste())
+
+            # copy and delete
+            right_click = Menu(root, tearoff=0)
+            right_click_small = Menu(root, tearoff=False)
+            right_click_small.add_command(label='Paste', command=paste_msg)
+
+            right_click.add_command(label="Delete", command=deleted)
+            right_click.add_command(label="Copy", command=copy_msg)
+
+            def do_popup(event):
+                try:
+                    right_click.tk_popup(event.x_root, event.y_root)
+                finally:
+                    right_click.grab_release()
+
+            def do_popup_small(event):
+                try:
+                    right_click_small.tk_popup(event.x_root, event.y_root)
+                finally:
+                    right_click_small.grab_release()
+
+            self.entry.bind('<Button-3>', do_popup_small)
+            self.entry.bind('<Control-Key-v>', paste_msg_event)
+            m_label.bind("<Button-3>", do_popup)
+
+            m_frame.pack(pady=10, padx=10, expand=True, anchor="e")
+
+            # high
+            if font_variable == 1:
+                t_label.config(font="lucida 14 bold")
+                m_label.config(font="lucida 16 bold")
+            # medium
+            if font_variable == 2:
+                t_label.config(font="lucida 10 bold")
+                m_label.config(font="lucida 12 bold")
+            # small
+            if font_variable == 3:
+                t_label.config(font="lucida 7 bold")
+                m_label.config(font="lucida 9 bold")
+
+            self.canvas.update_idletasks()
+            self.canvas.yview_moveto(1.0)
+
+    def notification_format(self, data):
+        if data['n_type'] == 'joined':
+
+            name = data['name']
+            image = data['image_bytes']
+            extension = data['extension']
+            message = data['message']
+            client_id = data['id']
+            self.clients_connected[client_id] = (name, image, extension)
+            self.clients_online([client_id, name, image, extension])
+            # print(self.clients_connected)
+
+        elif data['n_type'] == 'left':
+            client_id = data['id']
+            message = data['message']
+            self.remove_labels(client_id)
+            del self.clients_connected[client_id]
+
+        m_frame = tk.Frame(self.scrollable_frame, bg="#595656")
+
+        t_label = tk.Label(m_frame, fg="white", bg="#595656", text=datetime.now().strftime('%H:%M'),
+                           font="lucida 11 bold")
+        t_label.pack()
+
+        m_label = tk.Label(m_frame, wraplength=250, text=message, font="lucida 13 bold", justify="left", bg="sky blue")
+        m_label.pack()
+
+        m_frame.pack(pady=10, padx=10, fill="x", expand=True, anchor="e")
+
+        self.canvas.yview_moveto(1.0)
+
+    def clients_online(self, new_added):
+        if not new_added:
+            pass
+            for user_id in self.clients_connected:
+                name = self.clients_connected[user_id][0]
+                image_bytes = self.clients_connected[user_id][1]
+                extension = self.clients_connected[user_id][2]
+
+                with open(f"{user_id}.{extension}", 'wb') as f:
+                    f.write(image_bytes)
+
+                self.all_user_image[user_id] = f"{user_id}.{extension}"
+
+                user = Image.open(f"{user_id}.{extension}")
+                user = user.resize((45, 45), Image.ANTIALIAS)
+                user = ImageTk.PhotoImage(user)
+
+                b = tk.Label(self, image=user, text=name, compound="left", fg="red", bg="#2b2b2b",
+                             font="lucida 10 bold", padx=15)
+                b.image = user
+                self.clients_online_labels[user_id] = (b, self.y)
+                self.x = 1700
+                b.place(x=1750, y=self.y)
+                self.x += 700
+                self.y += 60
+        else:
+            user_id = new_added[0]
+            name = new_added[1]
+            image_bytes = new_added[2]
+            extension = new_added[3]
+
+            with open(f"{user_id}.{extension}", 'wb') as f:
+                f.write(image_bytes)
+
+            self.all_user_image[user_id] = f"{user_id}.{extension}"
+
+            user = Image.open(f"{user_id}.{extension}")
+            user = user.resize((45, 45), Image.ANTIALIAS)
+            user = ImageTk.PhotoImage(user)
+            # =============================================================================############################################
+            b = tk.Label(self.parent, image=user, text=name, compound="left", fg="green", bg="#2b2b2b",
+                         font="lucida 13 bold", padx=35)
+            b.image = user
+            self.clients_online_labels[user_id] = (b, self.y)
+            self.x = 1700
+            b.place(x=self.x, y=self.y)
+            self.x += 500
+            self.y += 60
+
+    def remove_labels(self, client_id):
+        for user_id in self.clients_online_labels.copy():
+            b = self.clients_online_labels[user_id][0]
+            y_co = self.clients_online_labels[user_id][1]
+            if user_id == client_id:
+                print("yes")
+                b.destroy()
+                del self.clients_online_labels[client_id]
+                import os
+                # os.remove(self.all_user_image[user_id])
+
+            elif user_id > client_id:
+                y_co -= 60
+                b.place(x=510, y=y_co)
+                self.clients_online_labels[user_id] = (b, y_co)
+                self.y -= 60
+
+    def insert_emoji(self, x):
+        self.entry.insert("end-1c", x.widget['text'])
+
+    def first_screen(self):
+        self.destroy()
+        self.parent.geometry(f"550x400+{self.parent.x_co}+{self.parent.y_co}")
+        self.parent.first_frame.pack(fill="both", expand=True)
+        self.window = None
+
+
+obf = FirstScreen
+
+# images all white
+chat_img_white = Image.open(
+    "C:\\Users\\Admin01\\Downloads\\python project details\\chat_ip.jpg")
+chat_img_white = chat_img_white.resize((45, 35), Image.ANTIALIAS)
+chat_img_white = ImageTk.PhotoImage(chat_img_white)
+# microphone image
+microphone_logo_img_white = (
+    Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\local photos\\microphone.png"))
+resized_microphone_logo_img_white = microphone_logo_img_white.resize((70, 70), Image.ANTIALIAS)
+microphone_logo_img_white = ImageTk.PhotoImage(resized_microphone_logo_img_white)
+# send image white
+send_logo_img_white = (Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\local photos\\send img.png"))
+resized_send_logo_img_white = send_logo_img_white.resize((65, 65), Image.ANTIALIAS)
+send_logo_img_white = ImageTk.PhotoImage(resized_send_logo_img_white)
+# send logo small white
+send_logo_img_small_white = (
+    Image.open("C:\\Users\\Admin01\Downloads\\python project details\\local photos\\send img.png"))
+resized_send_logo_img_small_white = send_logo_img_small_white.resize((35, 35), Image.ANTIALIAS)
+send_logo_img_small_white = ImageTk.PhotoImage(resized_send_logo_img_small_white)
+# assistant image white
+assistant_logo_img_white = (
+    Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\local photos\\assitant icon.png"))
+resized_assistant_logo_img_white = assistant_logo_img_white.resize((70, 70), Image.ANTIALIAS)
+assistant_logo_img_white = ImageTk.PhotoImage(resized_assistant_logo_img_white)
+# back button logo white
+back_logo_img_white = (
+    Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\photos\\back white.png"))
+resized_back_logo_img_white = back_logo_img_white.resize((80, 60), Image.ANTIALIAS)
+back_button_img_white = ImageTk.PhotoImage(resized_back_logo_img_white)
+# logout white
+logout_logo_img_white = (
+    Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\local photos\\logout btn_cropped.png"))
+resized_logout_logo_img_white = logout_logo_img_white.resize((80, 80), Image.ANTIALIAS)
+logout_button_img_white = ImageTk.PhotoImage(resized_logout_logo_img_white)
+# home logo white
+home_logo_img_white = (
+    Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\local photos\\dummy\\home icon 3.png"))
+resized_home_logo_img_white = home_logo_img_white.resize((50, 50), Image.ANTIALIAS)
+home_button_img_white = ImageTk.PhotoImage(resized_home_logo_img_white)
+# loginn label white
+login_label_img_white = (Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\local photos"
+                                    "\\Untitled_new_cropped.png"))
+resized_login_label_img_image_white = login_label_img_white.resize((550, 400), Image.ANTIALIAS)
+new_login_label_img_white = ImageTk.PhotoImage(resized_login_label_img_image_white)
+# app logo white
+forget_password_logo_img_white = (
+    Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\local photos\\Untitled_new1.png"))
+resized_fp_img_white = forget_password_logo_img_white.resize((400, 120), Image.ANTIALIAS)
+new_fp_label_img_white = ImageTk.PhotoImage(resized_fp_img_white)
+# small app logo
+forget_password_logo_img_white_small = (
+    Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\local photos\\Untitled_new1.png"))
+resized_fp_img_white_small = forget_password_logo_img_white_small.resize((300, 100), Image.ANTIALIAS)
+new_fp_label_img_white_small = ImageTk.PhotoImage(resized_fp_img_white_small)
+
+# images all dark
+# home chat icon
+chat_img = Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\photos\\chat_ip.png")
+chat_img = chat_img.resize((50, 50), Image.ANTIALIAS)
+chat_img = ImageTk.PhotoImage(chat_img)
+# uploading image
+upload_image = Image.open(
+    "C:\\Users\\Admin01\\Downloads\\python project details\\Chat-App-main\\Chat-App-main\\images\\upload_ca.png")
+upload_image = upload_image.resize((50, 50), Image.ANTIALIAS)
+upload_image = ImageTk.PhotoImage(upload_image)
+# microphone image
+microphone_logo_img = (Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\photos\\microphone.png"))
+resized_microphone_logo_img = microphone_logo_img.resize((70, 70), Image.ANTIALIAS)
+microphone_logo_img = ImageTk.PhotoImage(resized_microphone_logo_img)
+# send image
+send_logo_img = (Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\photos\\send img.png"))
+resized_send_logo_img = send_logo_img.resize((65, 65), Image.ANTIALIAS)
+send_logo_img = ImageTk.PhotoImage(resized_send_logo_img)
+# send logo small
+send_logo_img_small = (Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\photos\\send img.png"))
+resized_send_logo_img_small = send_logo_img_small.resize((35, 35), Image.ANTIALIAS)
+send_logo_img_small = ImageTk.PhotoImage(resized_send_logo_img_small)
+# assistant image
+assistant_logo_img = (Image.open("C:\\Users\\Admin01\\Downloads\\python project details\photos\\icon_dup.png"))
+resized_assistant_logo_img = assistant_logo_img.resize((70, 70), Image.ANTIALIAS)
+assistant_logo_img = ImageTk.PhotoImage(resized_assistant_logo_img)
+# back button logo
+back_logo_img = (Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\photos\\backbutton.png"))
+resized_back_logo_img = back_logo_img.resize((50, 50), Image.ANTIALIAS)
+back_button_img = ImageTk.PhotoImage(resized_back_logo_img)
+# logout
+logout_logo_img = (Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\photos\\logout btn.png"))
+resized_logout_logo_img = logout_logo_img.resize((100, 100), Image.ANTIALIAS)
+logout_button_img = ImageTk.PhotoImage(resized_logout_logo_img)
+password_img = PhotoImage(
+    file="C:\\Users\\Admin01\\Downloads\\python project details\\photos\\password white image.png")
+username_image = PhotoImage(file="C:\\Users\\Admin01\\Downloads\\python project details\\photos\\user image white.png")
+# home logo
+home_logo_img = (Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\photos\\home icon 3.png"))
+resized_home_logo_img = home_logo_img.resize((50, 50), Image.ANTIALIAS)
+home_button_img = ImageTk.PhotoImage(resized_home_logo_img)
+
+# data colletion
+# root
+get_into_img = PhotoImage(file="C:\\Users\\Admin01\\Downloads\\python project details\\photos\\get started.png")
+# btn
+root_btn = Button(root, command=change_to_login_frame, image=get_into_img, cursor='hand2',
+                  relief='raised')  # change_to_login_frame
+root_btn.pack()
+root_btn.place(x=800, y=800)
+root_lbl_img = PhotoImage(file="C:\\Users\\Admin01\\Downloads\\python project details\\photos\\root page.png")
+root_lbl = Label(root, image=root_lbl_img, bg='#121212')
+root_lbl.pack()
+root_lbl.place(x=550, y=15)
+
+# login frame
+login_label_canvas = Canvas(login_frame, width=550, height=350, highlightbackground="#121212")
+login_label_canvas.config(bg='#121212')
+login_label_canvas.pack()
+login_label_img = (Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\photos\\LOGIN LABEL_resized.png"))
+resized_login_label_img_image = login_label_img.resize((550, 350), Image.ANTIALIAS)
+new_login_label_img = ImageTk.PhotoImage(resized_login_label_img_image)
+login_label_canvas.create_image(10, 10, anchor=NW, image=new_login_label_img)
+# login text
+login_page_text = Label(login_frame, text='Stay Connected to friends in a room with AstroChat!!', fg='white',
+                        bg='#121212',
+                        font=('Segoe UI', 18))
+login_page_text.pack()
+login_page_text.place(x=790, y=380)
+login_canvas = Canvas(login_frame, bg='#121212', highlightbackground="#FFA07A")
+login_canvas.place(x=220, y=500, height=420, width=1500)
+# user label and entries
+login_userlabel = Label(login_frame, text='USERNAME: ', fg='white', bg='#121212', font=('Leelawadee', 18))
+login_passlabel = Label(login_frame, text='PASSWORD: ', fg='white', bg='#121212', font=('Leelawadee', 18))
+login_userlabel.pack()
+login_passlabel.pack()
+login_userlabel.place(x=245, y=540)
+login_passlabel.place(x=245, y=620)
+nameE = Entry(login_frame, bd=0, highlightcolor="purple", highlightthickness=3, textvariable=un)
+nameE.insert(0, 'ENTER NAME')
+passE = Entry(login_frame, bd=0, show='*', highlightcolor="purple", highlightthickness=3, textvariable=pw)
+nameE.pack()
+nameE.place(x=425, y=530, height=45, width=180)
+passE.pack()
+passE.place(x=425, y=610, height=45, width=180)
+# buttons
+login_btn = Button(login_frame, text="                              Login                             ", bg='#1877F2',
+                   fg='white',
+                   activebackground='#0047AB',
+                   activeforeground='white', cursor='hand2', command=check_login, font=('Segoe UI', 18)
+                   )
+
+login_btn.bind('<Return>', login_handler2)
+login_btn.focus()
+
+forget_password_btn = Button(login_frame, text="FORGET PASSWORD?", bg='#121212',
+                             fg='white',
+                             activebackground='white',
+                             height=2, width=20, cursor='hand2',
+                             command=change_to_forget_password_frame, border=0, font=('Segoe UI', 14)
+                             )
+
+create_act_btn = Button(login_frame, text=" CREATE ACCOUNT ", bg='#42B72A',
+                        fg='WHITE',
+                        activebackground='#00A36C',
+                        activeforeground='white', height=2, width=20, cursor='hand1', command=change_to_create_act_frame
+                        , font=('Segoe UI', 14))
+main_label = Label(login_frame, text='create an account to start chat', fg='white', bg='#121212', font=('Segoe UI', 14))
+main_label.place(x=1400, y=740)
+login_btn.pack()
+login_btn.place(x=620, y=820)
+forget_password_btn.pack()
+forget_password_btn.place(x=480, y=670)
+create_act_btn.pack()
+create_act_btn.place(x=1420, y=650)
+line = Canvas(login_frame, height=410, width=1, bg='white', highlightbackground="#121212")
+line.place(x=1315, y=504)
+# bind
+nameE.bind('<Button-1>', login_handler1)
+
+# forget password frame
+forget_password_logo_img = (Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\photos\\logo.png"))
+resized_fp_img = forget_password_logo_img.resize((400, 130), Image.ANTIALIAS)
+new_fp_label_img = ImageTk.PhotoImage(resized_fp_img)
+fp_label = Label(forget_password_frame, image=new_fp_label_img, bg='#121212')
+fp_label.pack()
+fp_label.place(x=5, y=5)
+# canvas with variables
+fp_canvas = Canvas(forget_password_frame, bg='#121212', highlightbackground="#FFA07A")
+fp_canvas.pack()
+fp_canvas.place(relx=0.5, rely=0.5, anchor=CENTER, height=570, width=800)
+# canvas labels
+Label(forget_password_frame, text='WE ARE ALWAYS HERE TO HELP YOU,PLEASE ENTER THE REQUIRED DATA TO VERIFY ITS YOU!',
+      font=('Leelawadee', 12)).place(x=600, y=850)
+fp_canvas.create_text(400, 50, text='FORGET PASSWORD/CHANGE PASSWORD', font=('Leelawadee', 18), fill='white')
+fp_canvas.create_text(60, 123, text='NAME:', font=('Leelawadee', 18), fill='white')
+fp_canvas.create_text(120, 195, text='NEW PASSWORD:', font=('Leelawadee', 18), fill='white')
+fp_canvas.create_text(154, 258, text='RE-ENTER PASSWORD:', font=('Leelawadee', 18), fill='white')
+# entries
+u_name_labelE = Entry(forget_password_frame, textvariable=n, highlightcolor="purple", highlightthickness=3)
+u_name_labelE.insert(0, 'Enter Name Of User')
+u_name_labelE.bind('<Button-1>', fp_handler)
+p_fp_labelE = Entry(forget_password_frame, textvariable=npw, highlightcolor="purple", highlightthickness=3, show='*')
+cp_fp_labelE = Entry(forget_password_frame, textvariable=cnpw, highlightcolor="purple", highlightthickness=3, show='*')
+u_name_labelE.place(x=950, y=320, height=42, width=280)
+p_fp_labelE.place(x=950, y=390, height=42, width=280)
+cp_fp_labelE.place(x=950, y=460, height=42, width=350)
+# buttons
+fp_btn = Button(forget_password_frame, text='Search', fg='white',
+                activebackground='#0047AB',
+                activeforeground='white', height=2, width=8, cursor='hand2', command=forget_password, bg='#42B72A')
+fp_btn.bind('Return', fp_handler1)
+fp_btn.focus()
+
+forgetpassword_to_login_btn = Button(forget_password_frame,
+                                     cursor='hand1', bg="#121212", command=change_to_login_frame, image=back_button_img,
+                                     border=0,
+                                     highlightbackground="#121212", relief='flat')
+fp_btn.pack()
+fp_btn.place(x=940, y=730, anchor=CENTER, width=120)
+
+forgetpassword_to_login_btn.pack()
+forgetpassword_to_login_btn.place(x=1850, y=43)
+
+# create act frame
+crt_act_label = Label(create_act_frame, image=new_fp_label_img, bg='#121212')
+crt_act_label.pack()
+crt_act_label.place(x=5, y=1)
+# canvas with variables
+crt_act_canvas = Canvas(create_act_frame, bg='#121212', highlightbackground="#FFA07A")
+crt_act_canvas.pack()
+crt_act_canvas.place(relx=0.5, rely=0.5, anchor=CENTER, height=700, width=900)
+# var
+crt_act_canvas.create_text(75, 150,
+                           text='NAME:',
+                           font=('helvitica', 28), fill='white')
+crt_act_canvas.create_text(75, 200,
+                           text='EMAIL:',
+                           font=('helvitica', 28), fill='white')
+crt_act_canvas.create_text(125, 245,
+                           text='USERNAME:',
+                           font=('helvitica', 28), fill='white')
+crt_act_canvas.create_text(130, 293,
+                           text='PASSWORD:',
+                           font=('helvitica', 28), fill='white')
+crt_act_canvas.create_text(160, 345,
+                           text='DATE OF BIRTH:',
+                           font=('helvitica', 28), fill='white')
+crt_act_canvas.create_text(130, 390,
+                           text='GIVEN ID NO:',
+                           font=('helvitica', 28), fill='white')
+# crt ac entries
+c_nameE = Entry(create_act_frame, bd=0, textvariable=c_name, highlightcolor="purple", highlightthickness=3)
+c_nameE.insert(0, 'ENTER NAME')
+c_nameE.bind("<Button-1>", crt_act_handler1)
+
+c_mailE = Entry(create_act_frame, bd=0, highlightcolor="purple", highlightthickness=3)
+c_mailE.insert(0, 'ENTER MAIL ID')
+c_mailE.bind("<Button-1>", crt_act_handler)
+
+c_usernameE = Entry(create_act_frame, bd=0, textvariable=c_uname, highlightcolor="purple", highlightthickness=3)
+c_usernameE.insert(0, 'CREATE A USERNAME')
+c_usernameE.bind("<Button-1>", crt_act_handler3)
+
+c_passE = Entry(create_act_frame, bd=0, show='*', textvariable=c_pass, highlightcolor="purple", highlightthickness=3)
+c_dobE = Entry(create_act_frame, bd=0, highlightcolor="purple", highlightthickness=3)
+c_dobE.insert(0, 'ENTER DATE OF BIRTH DD.MM.YYYY')
+c_dobE.bind("<Button-1>", crt_act_handler2)
+
+c_IDE = Entry(create_act_frame, bd=0, textvariable=c_id, highlightcolor="purple", highlightthickness=3)
+c_IDE.insert(0, 'ENTER THE GIVEN ID 20MIAXXXX')
+c_IDE.bind("<Button-1>", crt_act_handler4)
+
+c_nameE.place(x=900, y=280, height=42, width=280)
+c_mailE.place(x=900, y=330, height=42, width=280)
+c_usernameE.place(x=900, y=380, height=42, width=280)
+c_passE.place(x=900, y=430, height=42, width=280)
+c_dobE.place(x=900, y=480, height=42, width=280)
+c_IDE.place(x=900, y=530, height=42, width=280)
+# Buttons
+C_crt_act_btn = Button(create_act_frame, text='CREATE ACCOUNT', fg='black',
+                       activebackground='green',
+                       activeforeground='white', height=2, width=16, cursor='hand2', command=create_account,
+                       bg='#FFFF00')
+C_crt_act_btn.focus()
+C_crt_act_btn.pack()
+C_crt_act_btn.place(x=900, y=750)
+crt_act_to_login = Button(create_act_frame, cursor='hand1', bg="#121212", command=change_to_login_frame,
+                          image=back_button_img, border=0,
+                          highlightbackground="#121212", relief='flat')
+crt_act_to_login.pack()
+crt_act_to_login.place(x=1850, y=43)
+
+# homepage
+homepage_label = Label(homepage_frame, text='WELCOME TO ASTROCHAT', bg='#121212', fg='white',
+                       font=('Segoe script', 30, 'bold'))
+homepage_label.place(x=690, y=2)
+loginpage_btn = Button(homepage_frame, command=change_to_login_frame,
+                       cursor='hand1', image=logout_button_img, border=0, bg='#121212')
+assistant_btn = Button(homepage_frame, cursor='hand1', bg='lightblue', fg='green', image=assistant_logo_img,
+                       highlightbackground="#121212", command=change_to_assitant_frame)
+assistant_btn.place(x=20, y=900)
+loginpage_btn.place(x=1800, y=43)
+# time and present date
+root.after(1000, clock_time)
+fnt = font.Font(family="helvetica", size=25, weight="bold")
+lbl = Label(homepage_frame, textvariable=txt, font=fnt, foreground="white", background="#121212")
+lbl.place(x=1580, y=890, height=100, width=370)
+# random friendship quotes running
+canvas = Canvas(homepage_frame, bg='#121212', highlightthickness=1, highlightbackground="#121212")
+canvas.pack(fill=X)
+canvas.place(x=0, y=65)
+quotes = ["A real friend is one who walks in when the rest of the world walks out. — Walter Winchell",
+          "Lots of people want to ride with you in the limo, but what you want is someone who will take the bus with "
+          "you when the limo breaks down. — Oprah Winfrey",
+          "If you live to be a hundred, I hope I live to be a hundred minus one day, "
+          "so I never have to live without you. — Winnie the Pooh",
+          "Real friendship is when your friend comes over to your house and then you both just take a nap."]
+a = random.randint(0, 3)
+text_var = quotes[a]
+text = canvas.create_text(0, -2000, text=text_var, font=('Times New Roman', 20, 'bold'), fill='gold',
+                          tags=("marquee",), anchor='w')
+x1, y1, x2, y2 = canvas.bbox("marquee")
+canvas['width'] = 980
+canvas['height'] = 80
+fps = 40  # Change the fps to make the animation faster/slower
+shift()
+
+chat_btn = Button(homepage_frame, image=chat_img, bg='#121212', bd=0, border=0, command=obf)
+chat_btn.pack()
+chat_btn.place(x=1760, y=68)
+
+home_side_label = Image.open("C:\\Users\\Admin01\\Downloads\\python project details\photos\\startpage_dup.png")
+home_side_label = home_side_label.resize((70, 70), Image.ANTIALIAS)
+home_side_label = ImageTk.PhotoImage(home_side_label)
+home_new_label = Label(homepage_frame, image=home_side_label, bg='#121212')
+home_new_label.place(x=1300, y=2)
+
+# assitant
+forget_password_logo_img = (Image.open("C:\\Users\\Admin01\\Downloads\\python project details\\photos\\logo.png"))
+resized_fp_img = forget_password_logo_img.resize((300, 100), Image.ANTIALIAS)
+new_fp_label_img = ImageTk.PhotoImage(resized_fp_img)
+
+AI_label = Label(assistant_frame, image=new_fp_label_img, bg='#121212')
+AI_label.place(x=5, y=0)
+ai_container = Frame(assistant_frame, highlightbackground="#121212", highlightthickness=2)
+ai_canvas = Canvas(ai_container, bg="#121212", bd=0, highlightcolor='#121212')
+ai_canvas.place(x=30, width=10)
+scrollable_frame = Frame(ai_canvas, bg="#121212", highlightbackground="#121212", highlightthickness=2)
+scrollable_window = ai_canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+scrollable_frame.bind("<Configure>", configure_scroll_region)
+scrollbar = tk.Scrollbar(ai_container, orient="vertical", command=ai_canvas.yview)
+ai_canvas.configure(yscrollcommand=scrollbar.set)
+ai_canvas.yview_moveto(100.0)
+scrollbar.pack(side="right", fill="y")
+
+ai_canvas.bind("<Configure>", resize_frame)
+ai_canvas.pack(fill="both", expand=True)
+
+AI_entry = Entry(assistant_frame, font="lucida 15", width=110,
+                 highlightcolor="purple", highlightthickness=1)
+AI_entry.pack()
+AI_entry.place(x=170, y=902)
+
+'''send_button = Button(assistant_frame, text="Send", fg="#83eaf7", font="lucida 15 bold", bg="#7d7d7d", padx=10,
+                     relief="solid", bd=2, command=lambda: sent_message_format(event=None))'''
+send_button = Button(assistant_frame, padx=10, image=send_logo_img_small, bg='#121212',
+                     relief="solid", bd=2, command=lambda: sent_message_format(event=None))
+send_button.place(x=1400, y=898)
+
+voice_btn = Button(assistant_frame, image=microphone_logo_img, command=my_thread, bg='#121212')
+voice_btn.place(x=1500, y=901)
+
+voice_btn.bind('<ButtonRelease-1>', label_handler)
+
+listent_event = Label(assistant_frame, text='Listening...', bg='#121212', fg='white')
+
+
+def ai_wheel_handler(event):
+    ai_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+
+# bindings
+assistant_frame.bind('<Button-1>', func_stop_handler)
+ai_canvas.bind('<Button-1>', func_stop_handler)
+AI_entry.bind('<Button-1>', func_stop_handler)
+AI_entry.bind('<Shift-Key-Return>', AI_bind_enter)
+ai_canvas.bind_all('<MouseWheel>', ai_wheel_handler)
+ai_canvas.focus_get()
+# extra buttons
+ai_to_home = Button(assistant_frame, image=home_button_img, bg='#121212', relief='flat',
+                    command=change_to_homepage_frame)
+ai_to_home.pack()
+ai_to_home.place(x=1850, y=5)
+
+
+# ===================================================================================================== Menu Button
+def menu_to_login():
+    change_to_login_frame()
+
+
+# fonts
+def high_font():
+    global font_variable
+    font_variable = 1
+    login_page_text.config(font=('Segoe UI', 26))
+
+
+def low_font():
+    global font_variable
+    font_variable = 3
+    login_page_text.config(font=('Segoe UI', 18))
+
+
+def medium_font():
+    global font_variable
+    font_variable = 2
+
+
+# theme
+def darkmode():
+    global theme_variable
+    theme_variable = 1
+    # frames white
+    root.config(bg='#121212')
+    login_frame.config(bg='#121212')
+    forget_password_frame.config(bg='#121212')
+    create_act_frame.config(bg='#121212')
+    assistant_frame.config(bg='#121212')
+    homepage_frame.config(bg='#121212')
+
+    login_label_canvas.config(highlightbackground='#121212', bg='#121212')
+    login_page_text.config(bg='#121212', fg='white')
+    login_canvas.config(bg='#121212')
+    login_userlabel.config(bg='#121212', fg='white')
+    login_passlabel.config(bg='#121212', fg='white')
+    forget_password_btn.config(bg='#121212', fg='white')
+    main_label.config(bg='#121212', fg='white')
+    line.config(bg='white', highlightbackground="#121212")
+    login_label_canvas.create_image(10, 10, anchor=NW, image=new_login_label_img)
+    fp_label.config(image=new_fp_label_img, bg='#121212')
+    # ====================================================
+    fp_canvas.config(bg='#121212')
+    fp_canvas.place(relx=0.5, rely=0.5, anchor=CENTER, height=570, width=800)
+    # canvas labels
+    fp_canvas.create_text(400, 50, text='FORGET PASSWORD/CHANGE PASSWORD', font=('Leelawadee', 18), fill='white')
+    fp_canvas.create_text(60, 123, text='NAME:', font=('Leelawadee', 18), fill='white')
+    fp_canvas.create_text(120, 195, text='NEW PASSWORD:', font=('Leelawadee', 18), fill='white')
+    fp_canvas.create_text(154, 258, text='RE-ENTER PASSWORD:', font=('Leelawadee', 18), fill='white')
+    forgetpassword_to_login_btn.config(image=back_button_img, bg="#121212", highlightbackground="#121212")
+    crt_act_label.config(image=new_fp_label_img, bg='#121212')
+    # =====================================================================
+    crt_act_canvas.config(bg='#121212', highlightbackground="#FFA07A")
+    crt_act_canvas.place(relx=0.5, rely=0.5, anchor=CENTER, height=700, width=900)
+    # var
+    crt_act_canvas.create_text(75, 150,
+                               text='NAME:',
+                               font=('helvitica', 28), fill='white')
+    crt_act_canvas.create_text(75, 200,
+                               text='EMAIL:',
+                               font=('helvitica', 28), fill='white')
+    crt_act_canvas.create_text(125, 245,
+                               text='USERNAME:',
+                               font=('helvitica', 28), fill='white')
+    crt_act_canvas.create_text(130, 293,
+                               text='PASSWORD:',
+                               font=('helvitica', 28), fill='white')
+    crt_act_canvas.create_text(160, 345,
+                               text='DATE OF BIRTH:',
+                               font=('helvitica', 28), fill='white')
+    crt_act_canvas.create_text(130, 390,
+                               text='GIVEN ID NO:',
+                               font=('helvitica', 28), fill='white')
+    crt_act_to_login.config(image=back_button_img, highlightbackground="#121212", bg='#121212')
+
+    homepage_label.config(bg='#121212', fg='white')
+    loginpage_btn.config(image=logout_button_img, bg='#121212')
+    assistant_btn.config(image=assistant_logo_img, highlightbackground="#121212")
+    lbl.config(foreground="white", background="#121212")
+    canvas.config(bg='#121212', highlightbackground="#121212")
+    chat_btn.config(image=chat_img, bg='#121212')
+    home_new_label.config(bg='#121212')
+    AI_label.config(image=new_fp_label_img, bg='#121212')
+    # =================================================
+    ai_container.config(highlightbackground="#121212")
+    ai_canvas.config(bg="#121212", highlightcolor='#121212')
+    scrollable_frame.config(bg="#121212", highlightbackground="#121212")
+    voice_btn.config(bg='#121212', fg='white')
+    listent_event.config(bg='#121212', fg='white')
+    ai_to_home.config(image=home_button_img, bg='#121212', border=0)
+    send_button.config(image=send_logo_img, bg='#121212', border=0, )
+    voice_btn.config(image=microphone_logo_img, bg='#121212', border=0)
+    print(theme_variable)
+
+
+def lightmode():
+    global theme_variable
+    theme_variable = 2
+    # frames white
+    root.config(bg='#FFFFFF')
+    login_frame.config(bg='#FFFFFF')
+    forget_password_frame.config(bg='#FFFFFF')
+    create_act_frame.config(bg='#FFFFFF')
+    assistant_frame.config(bg='#FFFFFF')
+    homepage_frame.config(bg='#FFFFFF')
+
+    login_label_canvas.config(highlightbackground='#FFFFFF', bg='#FFFFFF')
+    login_page_text.config(bg='#FFFFFF', fg='black')
+    login_canvas.config(bg='#FFFFFF')
+    login_userlabel.config(bg='#FFFFFF', fg='black')
+    login_passlabel.config(bg='#FFFFFF', fg='black')
+    forget_password_btn.config(bg='#FFFFFF', fg='black')
+    main_label.config(bg='#FFFFFF', fg='black')
+    line.config(bg='black', highlightbackground="#FFFFFF")
+    login_label_canvas.create_image(10, 10, anchor=NW, image=new_login_label_img_white)
+    fp_label.config(image=new_fp_label_img_white, bg='#FFFFFF')
+    # ====================================================
+    fp_canvas.config(bg='#FFFFFF')
+    fp_canvas.place(relx=0.5, rely=0.5, anchor=CENTER, height=570, width=800)
+    # canvas labels
+    fp_canvas.create_text(400, 50, text='FORGET PASSWORD/CHANGE PASSWORD', font=('Leelawadee', 18), fill='black')
+    fp_canvas.create_text(60, 123, text='NAME:', font=('Leelawadee', 18), fill='black')
+    fp_canvas.create_text(120, 195, text='NEW PASSWORD:', font=('Leelawadee', 18), fill='black')
+    fp_canvas.create_text(154, 258, text='RE-ENTER PASSWORD:', font=('Leelawadee', 18), fill='black')
+    forgetpassword_to_login_btn.config(image=back_button_img_white, bg="#FFFFFF", highlightbackground="#FFFFFF")
+    crt_act_label.config(image=new_fp_label_img_white, bg='#FFFFFF')
+    # =====================================================================
+    crt_act_canvas.config(bg='#FFFFFF', highlightbackground="#FFA07A")
+    crt_act_canvas.place(relx=0.5, rely=0.5, anchor=CENTER, height=700, width=900)
+    # var
+    crt_act_canvas.create_text(75, 150,
+                               text='NAME:',
+                               font=('helvitica', 28), fill='black')
+    crt_act_canvas.create_text(75, 200,
+                               text='EMAIL:',
+                               font=('helvitica', 28), fill='black')
+    crt_act_canvas.create_text(125, 245,
+                               text='USERNAME:',
+                               font=('helvitica', 28), fill='black')
+    crt_act_canvas.create_text(130, 293,
+                               text='PASSWORD:',
+                               font=('helvitica', 28), fill='black')
+    crt_act_canvas.create_text(160, 345,
+                               text='DATE OF BIRTH:',
+                               font=('helvitica', 28), fill='black')
+    crt_act_canvas.create_text(130, 390,
+                               text='GIVEN ID NO:',
+                               font=('helvitica', 28), fill='black')
+    crt_act_to_login.config(image=back_button_img_white, highlightbackground="#FFFFFF", bg='#FFFFFF')
+
+    homepage_label.config(bg='#FFFFFF', fg='black')
+    loginpage_btn.config(image=logout_button_img_white, bg='#FFFFFF')
+    assistant_btn.config(image=assistant_logo_img_white, highlightbackground="#FFFFFF")
+    lbl.config(foreground="black", background="#FFFFFF")
+    canvas.config(bg='#FFFFFF', highlightbackground="#FFFFFF")
+    chat_btn.config(image=chat_img_white, bg='#FFFFFF')
+    home_new_label.config(bg='#FFFFFF')
+    AI_label.config(image=new_fp_label_img_white, bg='#FFFFFF')
+    # =================================================
+    ai_container.config(highlightbackground="#FFFFFF")
+    ai_canvas.config(bg="#FFFFFF", highlightcolor='#FFFFFF')
+    scrollable_frame.config(bg="#FFFFFF", highlightbackground="#FFFFFF")
+    voice_btn.config(bg='#FFFFFF', fg='black')
+    listent_event.config(bg='#FFFFFF', fg='black')
+    ai_to_home.config(image=home_button_img_white, bg='#FFFFFF', border=0)
+    send_button.config(image=send_logo_img_white, bg='#FFFFFF', border=0, )
+    voice_btn.config(image=microphone_logo_img_white, bg='#FFFFFF', border=0)
+    print(theme_variable)
+
+
+def astroasist_login():
+    change_to_login_frame()
+
+
+AppMenu = Menu(root)
+view_menu = Menu(root, tearoff=0)
+file_menu = Menu(root, tearoff=0)
+font_menu = Menu(root, tearoff=0)
+theme_menu = Menu(root, tearoff=0)
+help_menu = Menu(root, tearoff=0)
+send_menu = Menu(root, tearoff=0)
+
+root.config(menu=AppMenu)
+AppMenu.add_cascade(label='File', menu=file_menu)
+
+file_menu.add_command(label='My Profile')
+file_menu.add_command(label='Logout', command=menu_to_login)
+file_menu.add_command(label='exit', command=root.quit)
+
+# view menu
+AppMenu.add_cascade(label='View', menu=view_menu)
+view_menu.add_cascade(label="Fonts", menu=font_menu)
+font_menu.add_command(label='High', command=high_font)
+font_menu.add_command(label='Medium', command=medium_font)
+font_menu.add_command(label='Small', command=low_font)
+view_menu.add_cascade(label="Theme", menu=theme_menu)
+theme_menu.add_command(label='Dark', command=darkmode)
+theme_menu.add_command(label='Light', command=lightmode)
+view_menu.add_cascade(label='Profile View', menu=send_menu)
+send_menu.add_radiobutton(label='Private')
+send_menu.add_radiobutton(label='Public')
+
+# help menu
+AppMenu.add_cascade(label='Help', menu=help_menu)
+help_menu.add_command(label='Sign In', command=astroasist_login)
+help_menu.add_command(label='Terms and Policy')
+help_menu.add_command(label='App info')
+
+root.mainloop()
