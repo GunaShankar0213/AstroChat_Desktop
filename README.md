@@ -57,7 +57,8 @@ AstroChat Desktop is a feature-rich application that integrates a real-time chat
 - **SQL & Local Cache**: For managing user authentication and storing cached data.
 
 ## Demo and Usage
-// verify through the code sample ("https://github.com/GunaShankar0213/AstroChat_Desktop/blob/main/Astro%20chat%20complte%20code.txt")
+You can verify the functionality through the code sample available at [AstroChat Desktop Complete Code](https://github.com/GunaShankar0213/AstroChat_Desktop/blob/main/Astro%20chat%20complte%20code.txt).
+
 
 This project demonstrates the integration of multiple technologies to create a versatile and interactive cross-platform chat and AI assistant application. It combines real-time messaging, voice recognition, and seamless communication with a sleek user interface.
 
